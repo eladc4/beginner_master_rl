@@ -106,17 +106,17 @@ def quatromatrix(action_values, ax=None, triplotkw=None, tripcolorkw=None):
 def test_agent(env: gym.Env, policy: Callable, episodes: int = 10) -> None:
     plt.figure(figsize=(8, 8))
     for episode in range(episodes):
-        state = env.reset()
+        state, _ = env.reset()
         done = False
-        img = plt.imshow(env.render(mode='rgb_array'))
+        img = plt.imshow(env.render())
         while not done:
             p = policy(state)
             if isinstance(p, np.ndarray):
                 action = np.random.choice(4, p=p)
             else:
                 action = p
-            next_state, _, done, _ = env.step(action)
-            img.set_data(env.render(mode='rgb_array'))
+            next_state, _, done, _, _ = env.step(action)
+            img.set_data(env.render())
             plt.axis('off')
             display.display(plt.gcf())
             display.clear_output(wait=True)
@@ -215,7 +215,7 @@ def seed_everything(env: gym.Env, seed: int = 42) -> None:
     Returns:
         None.
     """
-    env.seed(seed)
+    env.reset(seed=seed)
     env.action_space.seed(seed)
     env.observation_space.seed(seed)
     np.random.seed(seed)
