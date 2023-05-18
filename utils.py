@@ -130,9 +130,9 @@ def plot_cost_to_go(env, q_network, xlabel=None, ylabel=None):
     Y = torch.linspace(lowy, highy, 100)
     X, Y = torch.meshgrid(X, Y)
 
-    q_net_input = torch.stack([X.flatten(), Y.flatten()], dim=-1)
+    q_net_input = torch.stack([X.flatten(), Y.flatten()], dim=-1).to(next(q_network.parameters()).device)
     Z = - q_network(q_net_input).max(dim=-1, keepdim=True)[0]
-    Z = Z.reshape(100, 100).detach().numpy()
+    Z = Z.reshape(100, 100).detach().cpu().numpy()
     X = X.numpy()
     Y = Y.numpy()
 
@@ -169,8 +169,8 @@ def plot_max_q(env, q_network, xlabel=None, ylabel=None, action_labels=[]):
     Y = torch.linspace(lowy, highy, 100)
     X, Y = torch.meshgrid(X, Y)
     q_net_input = torch.stack([X.flatten(), Y.flatten()], dim=-1)
-    Z = q_network(q_net_input).argmax(dim=-1, keepdim=True)
-    Z = Z.reshape(100, 100).T.detach().numpy()
+    Z = q_network(q_net_input.to(next(q_network.parameters()).device)).argmax(dim=-1, keepdim=True)
+    Z = Z.reshape(100, 100).T.detach().cpu().numpy()
     values = np.unique(Z.ravel())
     values.sort()
 
@@ -185,6 +185,7 @@ def plot_max_q(env, q_network, xlabel=None, ylabel=None, action_labels=[]):
     patches = [mpatches.Patch(color=color, label=label) for color, label in zip(colors, action_labels)]
     plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.tight_layout()
+    plt.show()
 
 
 def plot_stats(stats):
